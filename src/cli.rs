@@ -20,6 +20,36 @@ pub enum Zip {
         /// The folder location
         location: OsString,
         /// The name given to the zip file
-        name: Option<OsString>
+        name: Option<OsString>,
+
+        #[arg(short, long)]
+        verbose: bool,
+
+        #[arg(short, long)]
+        exclude: Vec<String>,
+
+        #[arg(short, long)]
+        include: Vec<String>,
+    },
+    Config {
+        #[command(subcommand)]
+        action: ConfigAction
     }
+}
+
+#[derive(Subcommand, Debug)]
+pub enum ConfigAction {
+    Set {
+        key: OsString,
+        value: OsString
+    },
+    Add {
+        key: OsString,
+        value: OsString
+    },
+    Remove {
+        key: OsString,
+        value: OsString
+    },
+    List
 }

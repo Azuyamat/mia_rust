@@ -8,5 +8,8 @@ authors = ["Azuyamat"]
 
 [dependencies]
 clap = { version = "4.4.8", features = ["derive"] }
+confy = "0.5.1"
 inline_colorization = "0.1.6"
 zip = "0.6.6"
+serde = { version = "1.0.192", features = ["derive"] }
+chrono = "0.4.31"

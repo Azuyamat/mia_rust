@@ -7,7 +7,9 @@ pub enum Error {
     PathNotFound,
     PathNotDir,
     ZipFileFail(Option<std::io::Error>),
-    CantReadFile
+    CantReadFile,
+    Config(confy::ConfyError),
+    ConfigActionError(String)
 }
 
 impl Debug for Error {
@@ -27,6 +29,12 @@ impl Debug for Error {
             }
             Error::CantReadFile => {
                 write!(f, "File couldn't be read")
+            }
+            Error::Config(error) => {
+                write!(f, "Config error {error}")
+            }
+            Error::ConfigActionError(error) => {
+                write!(f, "Config action error: {error}")
             }
         }
     }

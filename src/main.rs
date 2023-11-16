@@ -15,7 +15,8 @@ fn main() -> Result<(), Error> {
 
     match args.zip {
         Zip::Create { location, name } => {
-            let directory = Directory::new(&location, &name)?;
+            let mut directory = Directory::new(&location, &name)?;
+            directory.zip_it()?;
         }
     }
 

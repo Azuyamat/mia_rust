@@ -47,7 +47,17 @@ impl Directory {
         })
     }
 
-    pub fn add_to_zip(&mut self, location: &PathBuf) {
+    pub fn zip_it(&mut self) -> Result<(), Error> {
+        let mut directory: &mut Directory = self;
+        let location = &*directory.location;
+
+        println!("Zipping dir {:?}", &location);
+        directory.add_to_zip(&location.to_path_buf())?;
+        directory.zip.finish().map_err(|_| Error::ZipFileFail(None))?;
+        Ok(())
+    }
+
+    pub fn add_to_zip(&mut self, location: &PathBuf) -> Result<(), Error> {
         let paths = fs::read_dir(&location.as_path()).unwrap();
 
         for path in paths {
@@ -55,12 +65,17 @@ impl Directory {
                 let location = &path.path();
                 if location.is_dir() {
                     &self.add_to_zip(location);
+                    println!("Reading dir {:?}", location);
                 } else if location.is_file() {
+                    let content = fs::read(&location).map_err(|_| Error::CantReadFile)?;
                     let stripped_path = location.strip_prefix(&self.location).unwrap().to_path_buf().into_os_string().into_string().unwrap();
 
-                    &self.zip.start_file(stripped_path, FileOptions::default());
+                    &self.zip.start_file(&stripped_path, FileOptions::default());
+                    &self.zip.write_all(&*content);
+                    println!("Reading file: {:?}", &stripped_path);
                 }
             }
         }
+        Ok(())
     }
 }

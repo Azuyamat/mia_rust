@@ -6,7 +6,8 @@ use std::fmt::{Debug, Formatter};
 pub enum Error {
     PathNotFound,
     PathNotDir,
-    ZipFileFail(Option<std::io::Error>)
+    ZipFileFail(Option<std::io::Error>),
+    CantReadFile
 }
 
 impl Debug for Error {
@@ -23,6 +24,9 @@ impl Debug for Error {
                     Some(error) => write!(f, "Zip file couldn't be created {:?}", error),
                     _ => write!(f, "Couldn't execute method on zip file")
                 }
+            }
+            Error::CantReadFile => {
+                write!(f, "File couldn't be read")
             }
         }
     }

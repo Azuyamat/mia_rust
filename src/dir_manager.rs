@@ -15,6 +15,7 @@ use std::time::Duration;
 use zip::write::FileOptions;
 use crate::error;
 use zip::ZipWriter;
+use inline_colorization::*;
 
 pub struct Directory {
     pub location: PathBuf,
@@ -24,7 +25,6 @@ pub struct Directory {
 
 impl Directory {
     pub fn new(location: &OsString, name: &Option<OsString>) -> Result<Directory, Error> {
-        //TODO: Make sure the location follows a valid pattern
         let path = Path::new(&location);
         if !&path.exists() { return Err(Error::PathNotFound); }
         if !&path.is_dir() { return Err(Error::PathNotDir); }
@@ -65,14 +65,14 @@ impl Directory {
                 let location = &path.path();
                 if location.is_dir() {
                     &self.add_to_zip(location);
-                    println!("Reading dir {:?}", location);
+                    println!("Reading dir {color_cyan}{:?}{color_reset}", location);
                 } else if location.is_file() {
                     let content = fs::read(&location).map_err(|_| Error::CantReadFile)?;
                     let stripped_path = location.strip_prefix(&self.location).unwrap().to_path_buf().into_os_string().into_string().unwrap();
 
                     &self.zip.start_file(&stripped_path, FileOptions::default());
                     &self.zip.write_all(&*content);
-                    println!("Reading file: {:?}", &stripped_path);
+                    println!("Reading file: {color_cyan}{:?}{color_reset}", &stripped_path);
                 }
             }
         }

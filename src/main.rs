@@ -1,3 +1,6 @@
+// Mia Command Line Interface
+// Author: Derek Blaney
+
 mod cli;
 mod dir_manager;
 mod error;

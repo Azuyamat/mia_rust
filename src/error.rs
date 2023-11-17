@@ -17,29 +17,16 @@ pub enum Error {
 
 impl Debug for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Error::PathNotFound => {
-                write!(f, "The input path is not found")
-            }
-            Error::PathNotDir => {
-                write!(f, "The input path is not a directory")
-            }
-            Error::ZipFileFail(error) => {
-                write!(f, "Zip file failed {error}")
-            }
-            Error::CantReadFile => {
-                write!(f, "File couldn't be read")
-            }
-            Error::Config(error) => {
-                write!(f, "Config error {error}")
-            }
-            Error::ConfigActionError(error) => {
-                write!(f, "Config action error: {error}")
-            }
-            Error::IO(error) => {
-                write!(f, "I/O error {error}")
-            }
-        }
+        let msg: String = match self {
+            Error::PathNotFound => "The input path is not found".to_owned(),
+            Error::PathNotDir => "The input path is not a directory".to_owned(),
+            Error::ZipFileFail(error) => format!("Zip file failed {}", error),
+            Error::CantReadFile => "File couldn't be read".to_owned(),
+            Error::Config(error) => format!("Config error {}", error),
+            Error::IO(error) => format!("IO error {}", error),
+            Error::ConfigActionError(error) => format!("Config action error: {}", error),
+        };
+        write!(f, "{}", msg)
     }
 }
 

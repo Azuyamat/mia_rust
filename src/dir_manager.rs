@@ -7,18 +7,17 @@ use chrono::{DateTime, Utc};
 use error::Error;
 use inline_colorization::*;
 use std::ffi::{OsStr, OsString};
-use std::fmt::format;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-use std::ops::{Add, Deref};
-use std::path::{Path, PathBuf, StripPrefixError};
+use std::ops::Add;
+use std::path::{Path, PathBuf};
 use std::string::String;
-use std::thread::sleep;
-use std::time::{Duration, Instant, SystemTime};
+use std::time::{Instant, SystemTime};
 use zip::write::FileOptions;
 use zip::ZipWriter;
 
+#[allow(dead_code)]
 pub struct Directory {
     pub location: PathBuf,
     name: OsString,

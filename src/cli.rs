@@ -19,6 +19,8 @@ pub enum Zip {
         /// The name given to the zip file
         name: Option<OsString>,
 
+        // Flags
+
         #[arg(short, long)]
         verbose: bool,
 
@@ -27,6 +29,9 @@ pub enum Zip {
 
         #[arg(short, long)]
         include: Vec<String>,
+
+        #[arg(short, long)]
+        out: Option<String>,
     },
     Config {
         #[command(subcommand)]

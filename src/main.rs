@@ -24,9 +24,15 @@ fn main() -> Result<(), Error> {
             verbose,
             exclude,
             include,
+            out
         } => {
+            let output_dir = if out.is_none() {
+                config.output_dir.clone()
+            } else {
+                out
+            };
             let mut directory =
-                Directory::new(&location, &name, config, verbose, exclude, include)?;
+                Directory::new(&location, &name, config, verbose, exclude, include, output_dir)?;
             directory.zip_it()?;
         }
         Zip::Config { action } => {
@@ -35,24 +41,31 @@ fn main() -> Result<(), Error> {
                     let string_key = key.clone().into_string().unwrap().to_ascii_lowercase();
                     let string_value = value.into_string().unwrap();
                     config.set_key(&string_key, string_value.clone())?;
-                    println!("Successfully changed key `{string_key}` to `{string_value}`")
+                    println!("Successfully changed key {color_cyan}`{string_key}`{color_reset} to \
+                    {color_cyan}`{string_value}`{color_reset}")
                 }
                 ConfigAction::Add { key, value } => {
                     let string_key = key.clone().into_string().unwrap().to_ascii_lowercase();
                     let string_value = value.into_string().unwrap();
                     config.add_value(&string_key, string_value.clone())?;
-                    println!("Successfully added value `{string_value}` to `{string_key}`");
+                    println!("Successfully added value {color_cyan}`{string_value}`{color_reset} \
+                    to {color_cyan}`{string_key}`{color_reset}");
                 }
                 ConfigAction::Remove { key, value } => {
                     let string_key = key.clone().into_string().unwrap().to_ascii_lowercase();
                     let string_value = value.into_string().unwrap();
                     config.remove_value(&string_key, string_value.clone())?;
-                    println!("Successfully removed value `{string_value}` from `{string_key}`");
+                    println!("Successfully removed value {color_cyan}`{string_value}`{color_reset} \
+                    from {color_cyan}`{string_key}`{color_reset}");
                 }
                 ConfigAction::List => {
                     print_pretty_header("Config List", 4);
                     println!(" - Naming: {}", config.naming);
                     println!(" ↳ {color_cyan}mia config set naming <format>{color_reset}");
+                    println!(" - Output Dir: {}", config.output_dir.clone().unwrap_or("Not set"
+                        .to_string
+                    ()));
+                    println!(" ↳ {color_cyan}mia config set output_dir <format>{color_reset}");
                     println!(
                         " - Blacklisted file names: {:?}",
                         config.blacklisted_file_names

@@ -17,8 +17,8 @@ impl Default for Config {
         Self {
             naming: ":name".to_string(),
             blacklisted_file_names: Vec::new(),
-            blacklisted_folder_names: vec![".git".to_string()],
-            blacklisted_file_extensions: vec![".zip".to_string()],
+            blacklisted_folder_names: vec![".git".to_string(), "bin".to_string(), "obj".to_string(), ".idea".to_string(), ".vs".to_string()],
+            blacklisted_file_extensions: vec!["zip".to_string(), "pdf".to_string()],
         }
     }
 }

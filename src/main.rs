@@ -72,17 +72,17 @@ fn main() -> Result<(), Error> {
                         " - Blacklisted file names: {:?}",
                         config.blacklisted_file_names
                     );
-                    println!(" ↳ {color_cyan}mia config add/remove blacklisted_file_names <key> <value>{color_reset}");
+                    println!(" ↳ {color_cyan}mia config add/remove blacklisted_file_names <value>{color_reset}");
                     println!(
                         " - Blacklisted folder names: {:?}",
                         config.blacklisted_folder_names
                     );
-                    println!(" ↳ {color_cyan}mia config add/remove blacklisted_folder_names <key> <value>{color_reset}");
+                    println!(" ↳ {color_cyan}mia config add/remove blacklisted_folder_names <value>{color_reset}");
                     println!(
                         " - Blacklisted file extensions: {:?}",
                         config.blacklisted_file_extensions
                     );
-                    println!(" ↳ {color_cyan}mia config add/remove blacklisted_file_extensions <key> <value>{color_reset}");
+                    println!(" ↳ {color_cyan}mia config add/remove blacklisted_file_extensions <value>{color_reset}");
                 }
             }
 

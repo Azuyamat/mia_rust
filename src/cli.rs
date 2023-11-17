@@ -24,14 +24,21 @@ pub enum Zip {
         #[arg(short, long)]
         verbose: bool,
 
+        /// Exclude certain files, extensions, folders
         #[arg(short, long)]
         exclude: Vec<String>,
 
+        /// Include certain files, extensions, folders
         #[arg(short, long)]
         include: Vec<String>,
 
+        /// Set the output directory
         #[arg(short, long)]
         out: Option<String>,
+
+        /// Uses default output (Same directory as input) instead of config value
+        #[arg(short, long)]
+        default_out: bool,
     },
     Config {
         #[command(subcommand)]

@@ -78,9 +78,7 @@ impl Directory {
         };
 
         let zip_path = &save_path.join(&zip_name);
-        println!("{:?}", zip_path);
         let zip_file = File::create(zip_path).map_err(Error::IO)?;
-        println!("{:?}", zip_file);
         let zip = ZipWriter::new(zip_file);
 
         Ok(Directory {

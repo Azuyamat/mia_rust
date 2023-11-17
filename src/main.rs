@@ -24,13 +24,15 @@ fn main() -> Result<(), Error> {
             verbose,
             exclude,
             include,
-            out
+            out,
+            default_out,
         } => {
-            let output_dir = if out.is_none() {
+            let mut output_dir = if out.is_none() {
                 config.output_dir.clone()
             } else {
                 out
             };
+            if default_out { output_dir = None; }
             let mut directory =
                 Directory::new(&location, &name, config, verbose, exclude, include, output_dir)?;
             directory.zip_it()?;

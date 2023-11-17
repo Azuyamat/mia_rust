@@ -1,15 +1,18 @@
 // Error Handler
 // Author: Derek Blaney
 
+use confy::ConfyError;
 use std::fmt::{Debug, Formatter};
+use zip::result::ZipError;
 
 pub enum Error {
     PathNotFound,
     PathNotDir,
-    ZipFileFail(Option<std::io::Error>),
+    ZipFileFail(ZipError),
+    IO(std::io::Error),
     CantReadFile,
-    Config(confy::ConfyError),
-    ConfigActionError(String)
+    Config(ConfyError),
+    ConfigActionError(String),
 }
 
 impl Debug for Error {
@@ -22,10 +25,7 @@ impl Debug for Error {
                 write!(f, "The input path is not a directory")
             }
             Error::ZipFileFail(error) => {
-                match error {
-                    Some(error) => write!(f, "Zip file couldn't be created {:?}", error),
-                    _ => write!(f, "Couldn't execute method on zip file")
-                }
+                write!(f, "Zip file failed {error}")
             }
             Error::CantReadFile => {
                 write!(f, "File couldn't be read")
@@ -36,6 +36,27 @@ impl Debug for Error {
             Error::ConfigActionError(error) => {
                 write!(f, "Config action error: {error}")
             }
+            Error::IO(error) => {
+                write!(f, "I/O error {error}")
+            }
         }
+    }
+}
+
+impl From<ConfyError> for Error {
+    fn from(error: ConfyError) -> Self {
+        Error::Config(error)
+    }
+}
+
+impl From<std::io::Error> for Error {
+    fn from(_error: std::io::Error) -> Self {
+        Error::ConfigActionError("Failed to execute I/O action".to_string())
+    }
+}
+
+impl From<ZipError> for Error {
+    fn from(error: ZipError) -> Self {
+        Error::ZipFileFail(error)
     }
 }

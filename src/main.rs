@@ -2,35 +2,31 @@
 // Author: Derek Blaney
 
 mod cli;
+mod config;
 mod dir_manager;
 mod error;
-mod config;
 
-use clap::Parser;
-use cli::{
-    Args,
-    Zip
-};
 use crate::cli::ConfigAction;
 use crate::dir_manager::Directory;
 use crate::error::Error;
+use clap::Parser;
+use cli::{Args, Zip};
 use inline_colorization::*; // This IS used. IDE doesn't detect it.
 
 fn main() -> Result<(), Error> {
-
     let args = Args::parse();
     let mut config: config::Config = confy::load("mia", None).map_err(Error::Config)?;
 
     match args.zip {
-        Zip::Create { location, name, verbose, exclude, include } => {
-            let mut directory = Directory::new(
-                &location,
-                &name,
-                config,
-                verbose,
-                exclude,
-                include
-            )?;
+        Zip::Create {
+            location,
+            name,
+            verbose,
+            exclude,
+            include,
+        } => {
+            let mut directory =
+                Directory::new(&location, &name, config, verbose, exclude, include)?;
             directory.zip_it()?;
         }
         Zip::Config { action } => {
@@ -57,11 +53,20 @@ fn main() -> Result<(), Error> {
                     print_pretty_header("Config List", 4);
                     println!(" - Naming: {}", config.naming);
                     println!(" ↳ {color_cyan}mia config set naming <format>{color_reset}");
-                    println!(" - Blacklisted file names: {:?}", config.blacklisted_file_names);
+                    println!(
+                        " - Blacklisted file names: {:?}",
+                        config.blacklisted_file_names
+                    );
                     println!(" ↳ {color_cyan}mia config add/remove blacklisted_file_names <key> <value>{color_reset}");
-                    println!(" - Blacklisted folder names: {:?}", config.blacklisted_folder_names);
+                    println!(
+                        " - Blacklisted folder names: {:?}",
+                        config.blacklisted_folder_names
+                    );
                     println!(" ↳ {color_cyan}mia config add/remove blacklisted_folder_names <key> <value>{color_reset}");
-                    println!(" - Blacklisted file extensions: {:?}", config.blacklisted_file_extensions);
+                    println!(
+                        " - Blacklisted file extensions: {:?}",
+                        config.blacklisted_file_extensions
+                    );
                     println!(" ↳ {color_cyan}mia config add/remove blacklisted_file_extensions <key> <value>{color_reset}");
                 }
             }
@@ -76,7 +81,7 @@ fn main() -> Result<(), Error> {
 
 pub fn print_pretty_header(text: &str, padding: usize) {
     let padding_text = " ".repeat(padding);
-    println!("{}", "=".repeat(text.len()+(padding*2)));
+    println!("{}", "=".repeat(text.len() + (padding * 2)));
     println!("{padding_text}{color_cyan}{text}{color_reset}{padding_text}");
-    println!("{}", "=".repeat(text.len()+(padding*2)));
+    println!("{}", "=".repeat(text.len() + (padding * 2)));
 }

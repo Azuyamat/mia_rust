@@ -44,6 +44,10 @@ pub enum Zip {
         #[command(subcommand)]
         action: ConfigAction,
     },
+    Update {
+        version: Option<String>
+    },
+    Version
 }
 
 #[derive(Subcommand, Debug)]

@@ -5,13 +5,18 @@ mod cli;
 mod config;
 mod dir_manager;
 mod error;
+mod release;
 
+use std::fs::{File, OpenOptions};
+use std::string::ToString;
+use std::time::Instant;
 use crate::cli::ConfigAction;
 use crate::dir_manager::Directory;
 use crate::error::Error;
 use clap::Parser;
 use cli::{Args, Zip};
-use inline_colorization::*; // This IS used. IDE doesn't detect it.
+use inline_colorization::*;
+use crate::release::{download_asset, get_download_link_for_asset, get_latest_release}; // This IS used. IDE doesn't detect it.
 
 fn main() -> Result<(), Error> {
     let args = Args::parse();
@@ -66,7 +71,7 @@ fn main() -> Result<(), Error> {
                     println!(" ↳ {color_cyan}mia config set naming <format>{color_reset}");
                     println!(" - Output Dir: {}", config.output_dir.clone().unwrap_or("Not set"
                         .to_string
-                    ()));
+                        ()));
                     println!(" ↳ {color_cyan}mia config set output_dir <format>{color_reset}");
                     println!(
                         " - Blacklisted file names: {:?}",
@@ -88,6 +93,26 @@ fn main() -> Result<(), Error> {
 
             // Save config
             confy::store("mia", None, config).map_err(Error::Config)?;
+        },
+        Zip::Update { version } => {
+            let version = match version {
+                None => { get_latest_release()? }
+                Some(version) => { version }
+            };
+
+            println!("Updating Mia to {color_bright_green}{version}{color_reset}");
+
+            let start = Instant::now();
+            let mut file = find_or_create_file("mia.exe")?;
+            let download_link = get_download_link_for_asset(&version)?;
+            download_asset(&download_link, &mut file)?;
+            let elapsed = start.elapsed().as_millis();
+
+            println!("Mia updated in {color_bright_green}{elapsed}ms{color_reset}");
+        },
+        Zip::Version => {
+            let version = env!("CARGO_PKG_VERSION");
+            println!("Current version: {color_cyan}{}{color_reset}", version);
         }
     }
 
@@ -99,4 +124,12 @@ pub fn print_pretty_header(text: &str, padding: usize) {
     println!("{}", "=".repeat(text.len() + (padding * 2)));
     println!("{padding_text}{color_cyan}{text}{color_reset}{padding_text}");
     println!("{}", "=".repeat(text.len() + (padding * 2)));
+}
+
+fn find_or_create_file(file_path: &str) -> std::io::Result<File> {
+    OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true) // Create the file if it doesn't exist
+        .open(file_path)
 }

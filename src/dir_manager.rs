@@ -134,6 +134,10 @@ impl Directory {
                 if self.config.blacklisted_folder_names.contains(&file_name)
                     && !self.include.contains(&file_name)
                 {
+                    if self.verbose {
+                        println!("[DIR] {color_yellow}/{color_reset} {color_cyan}{:?}{color_reset}",
+                                 location);
+                    }
                     continue;
                 }
                 self.add_to_zip(location)?;

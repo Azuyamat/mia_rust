@@ -23,6 +23,8 @@ Thank you for using!
 ```shell
 mia create <path> [name] [options]
 ```
+Creates a zip file of the given path with the given name. If no name is given, `mia_zip` will be used.
+
 **Options:**
 - `-v` `--verbose` - Verbose output
 - `-o <path>` `--out <path>` - Set the output path for the current creation
@@ -33,6 +35,7 @@ mia create <path> [name] [options]
 ```shell
 mia config <set/add/remove/list> <key> <value>
 ```
+Change config values.
 
 **Keys:**
 > Use `set`
@@ -41,7 +44,17 @@ mia config <set/add/remove/list> <key> <value>
 > Use `add/remove`
 - `blacklisted_file_names` - Blacklisted file names
 - `blacklisted_folder_names` - Blacklisted folder names
-- `blacklisted_file_extensions` - Blacklisted file extensions
+- `blacklisted_file_extensions` - Blacklisted file extensions (Do not include the `.`)
+
+```shell
+mia update [version]
+```
+Update the program to the latest version. If a version is given, it will update to that version.
+
+```shell
+mia version
+```
+Get the current version of the program.
 
 ## Examples
 

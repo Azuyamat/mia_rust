@@ -96,20 +96,25 @@ fn main() -> Result<(), Error> {
             confy::store("mia", None, config).map_err(Error::Config)?;
         },
         Zip::Update { version } => {
-            let version = match version {
+            let mut ver = match &version {
                 None => { get_latest_release()? }
-                Some(version) => { version }
+                Some(version) => { version.to_string() }
             };
 
-            println!("Updating Mia to {color_bright_green}{version}{color_reset}");
+            println!("Updating Mia to {color_bright_green}{ver}{color_reset}");
 
             let start = Instant::now();
             let mut file = find_or_create_file("mia.exe")?;
-            let download_link = get_download_link_for_asset(&version)?;
+            let download_link = get_download_link_for_asset(&ver)?;
             download_asset(&download_link, &mut file)?;
             let elapsed = start.elapsed().as_millis();
 
-            println!("Mia updated in {color_bright_green}{elapsed}ms{color_reset}");
+            ver = match &version {
+                None => { get_latest_release()? }
+                Some(version) => { version.to_string() }
+            };
+
+            println!("Mia updated in {color_bright_green}{elapsed}ms{color_reset} to {color_bright_green}{ver}{color_reset} (Run terminal as administrator if this didn't work)");
         },
         Zip::Version => {
             let version = env!("CARGO_PKG_VERSION");

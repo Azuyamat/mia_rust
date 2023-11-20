@@ -126,7 +126,7 @@ impl Directory {
                     println!("Other: {color_cyan}{count}{color_reset} lines");
                     continue;
                 }
-                let percentage: f64 = ((count.clone() as f64/line_count.clone() as f64)*10000.0).round()/100.0;
+                let percentage: f64 = ((count as f64/(*line_count) as f64)*10000.0).round()/100.0;
                 println!("{lang:?}: {color_cyan}{count}{color_reset} lines ({percentage}%)")
             }
             println!("--------------------------------------");

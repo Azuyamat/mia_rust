@@ -11,6 +11,11 @@ Otherwise, you may use the `mia` command in the terminal.
 
 Thank you for using!
 
+![GitHub release (with filter)](https://img.shields.io/github/v/release/Azuyamat/mia_rust?style=for-the-badge&logo=github)
+![GitHub release (by tag)](https://img.shields.io/github/downloads/Azuyamat/mia_rust/latest/total?style=for-the-badge&logo=github&label=Downloads&color=FFFFFF)
+
+
+
 ## Installation
 - Download the latest release from [here](https://github.com/Azuyamat/mia_rust/releases/latest)
 - Extract the zip file

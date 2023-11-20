@@ -56,8 +56,8 @@ impl From<ConfyError> for Error {
 }
 
 impl From<std::io::Error> for Error {
-    fn from(_error: std::io::Error) -> Self {
-        Error::ConfigActionError("Failed to execute I/O action".to_string())
+    fn from(error: std::io::Error) -> Self {
+        Error::IO(error)
     }
 }
 

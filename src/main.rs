@@ -8,6 +8,7 @@ mod error;
 mod release;
 mod languages;
 
+use std::fs;
 use std::fs::{File, OpenOptions};
 use std::string::ToString;
 use std::time::Instant;
@@ -104,9 +105,15 @@ fn main() -> Result<(), Error> {
             println!("Updating Mia to {color_bright_green}{ver}{color_reset}");
 
             let start = Instant::now();
-            let mut file = find_or_create_file("mia.exe")?;
+            let mut file = find_or_create_file("mia-tmp.exe")?;
+            println!("Downloading asset...");
             let download_link = get_download_link_for_asset(&ver)?;
             download_asset(&download_link, &mut file)?;
+            println!("Downloaded asset.");
+            println!("Renaming mia.exe to mia-old.exe");
+            fs::rename("mia.exe", "mia-old.exe")?;
+            println!("Renaming mia-tmp.exe to mia.exe");
+            fs::rename("mia-tmp.exe", "mia.exe")?;
             let elapsed = start.elapsed().as_millis();
 
             ver = match &version {

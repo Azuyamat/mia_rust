@@ -1,0 +1,71 @@
+[[languages]]
+extensions = ["rs"]
+language = "Rust"
+
+[[languages]]
+extensions = ["py"]
+language = "Python"
+
+[[languages]]
+extensions = ["java"]
+language = "Java"
+
+[[languages]]
+extensions = ["c"]
+language = "C"
+
+[[languages]]
+extensions = ["cpp"]
+language = "CPP"
+
+[[languages]]
+extensions = ["js", "jsx"]
+language = "JavaScript"
+
+[[languages]]
+extensions = ["html"]
+language = "HTML"
+
+[[languages]]
+extensions = ["css"]
+language = "CSS"
+
+[[languages]]
+extensions = ["php"]
+language = "PHP"
+
+[[languages]]
+extensions = ["swift"]
+language = "Swift"
+
+[[languages]]
+extensions = ["rb"]
+language = "Ruby"  # Corrected extension for Ruby
+
+[[languages]]
+extensions = ["go"]
+language = "Go"
+
+[[languages]]
+extensions = ["kt"]
+language = "Kotlin"  # Corrected extension for Kotlin
+
+[[languages]]
+extensions = ["scala"]
+language = "Scala"
+
+[[languages]]
+extensions = ["ts", "tsx"]
+language = "TypeScript"  # Corrected extension for TypeScript
+
+[[languages]]
+extensions = ["lua"]
+language = "Lua"
+
+[[languages]]
+extensions = ["dart"]
+language = "Dart"
+
+[[languages]]
+extensions = ["md"]
+language = "Markdown"

@@ -10,17 +10,15 @@ use inline_colorization::*;
 use std::ffi::{OsStr, OsString};
 use std::fs;
 use std::fs::File;
-use std::io::Write;
-use std::ops::Add;
+use std::io::{Write};
+use std::ops::{Add};
 use std::path::{Path, PathBuf};
 use std::string::String;
 use std::time::{Instant, SystemTime};
 use zip::write::FileOptions;
 use zip::ZipWriter;
+use crate::languages::{detect_language, Language};
 
-const LANGUAGES: [&str; 2] = ["py", "cs"];
-
-#[allow(dead_code)]
 pub struct Directory {
     pub location: PathBuf,
     name: OsString,
@@ -30,7 +28,8 @@ pub struct Directory {
     exclude: Vec<String>,
     include: Vec<String>,
     count: i32,
-    out: Option<String>
+    out: Option<String>,
+    lines: HashMap<Language, i128>
 }
 
 impl Directory {
@@ -71,7 +70,7 @@ impl Directory {
 
         let save_path = if let Some(out) = out {
             let p = Path::new(&out).to_path_buf();
-            fs::create_dir_all(&p).map_err(Error::IO)?;
+            fs::create_dir_all(&p)?;
             if !p.exists() { path.to_owned() }  else { p }
         } else {
             path.to_owned()
@@ -90,13 +89,13 @@ impl Directory {
             exclude,
             include,
             count: 0,
-            out: zip_path.clone().into_os_string().into_string().ok()
+            out: zip_path.clone().into_os_string().into_string().ok(),
+            lines: HashMap::new()
         })
     }
 
     // Zip the directory (initial action)
     pub fn zip_it(&mut self) -> Result<(), Error> {
-        let start = Instant::now();
         if self.verbose {
             println!("--------------------------------------");
             println!("Zipping: {color_cyan}{:?}{color_reset}", self.name);
@@ -107,33 +106,46 @@ impl Directory {
             println!("Including: {:?} (Use --include or -i)", self.include);
             println!("--------------------------------------");
         }
+        let start = Instant::now();
         self.add_to_zip(&self.location.to_owned())?;
         self.zip.finish().map_err(Error::ZipFileFail)?;
         let elapsed = start.elapsed().as_millis();
+        let line_count = &self.lines
+            .iter()
+            .filter(|(language, _)| *language != &Language::None)
+            .map(|(_, &count)| count)
+            .sum::<i128>();
         println!(
-            "Zipped {color_cyan}{}{color_reset} files in {color_cyan}{}ms{color_reset}",
+            "Zipped {color_cyan}{}{color_reset} files in {color_cyan}{}ms{color_reset} ({color_cyan}{line_count}{color_reset} lines)",
             self.count, elapsed
         );
-        if self.verbose { println!("--------------------------------------"); }
+        if self.verbose {
+            println!("--------------------------------------");
+            for (&lang, &count) in &self.lines {
+                if lang == Language::None {
+                    println!("Other: {color_cyan}{count}{color_reset} lines");
+                    continue;
+                }
+                let percentage: f64 = ((count.clone() as f64/line_count.clone() as f64)*10000.0).round()/100.0;
+                println!("{lang:?}: {color_cyan}{count}{color_reset} lines ({percentage}%)")
+            }
+            println!("--------------------------------------");
+        }
         Ok(())
     }
 
     // Add directory to zip for iteration
     fn add_to_zip(&mut self, location: &Path) -> Result<(), Error> {
-        let paths = fs::read_dir(location).expect("TODO: ERROR MESSAGE");
+        let paths = fs::read_dir(location)?;
         for path in paths.flatten() {
             let location = &path.path();
-            let mut file_name = os_string_to_lower_string(location.file_name());
+            let file_name = os_string_to_lower_string(location.file_name());
             let file_extension = os_string_to_lower_string(location.extension());
 
-            if self.exclude.contains(&file_name) && !self.include.contains(&file_name) {
-                continue;
-            }
+            if self.exclude.contains(&file_name) && !self.include.contains(&file_name) { continue; }
 
             if location.is_dir() {
-                if self.config.blacklisted_folder_names.contains(&file_name)
-                    && !self.include.contains(&file_name)
-                {
+                if self.config.blacklisted_folder_names.contains(&file_name) && !self.include.contains(&file_name) {
                     if self.verbose {
                         println!("[DIR] {color_yellow}/{color_reset} {color_cyan}{:?}{color_reset}",
                                  location);
@@ -146,9 +158,15 @@ impl Directory {
                              location);
                 }
             } else if location.is_file() {
-                file_name = file_name.replace(&".".to_string().add(&file_extension), "");
+                let mia_file: MiaFile = MiaFile::new (
+                    file_name,
+                    file_extension,
+                    location
+                );
 
-                let content = fs::read(location).map_err(|_| Error::CantReadFile)?;
+                if self.config.blacklisted_file_names.contains(&mia_file.name) && !self.include.contains(&mia_file.name) { continue; }
+                if self.config.blacklisted_file_extensions.contains(&mia_file.extension) && !self.include.contains(&mia_file.extension) { continue; }
+
                 let stripped_path = location
                     .strip_prefix(&self.location)
                     .unwrap()
@@ -157,44 +175,68 @@ impl Directory {
                     .into_string()
                     .unwrap();
 
-                if self.config.blacklisted_file_names.contains(&file_name)
-                    && !self.include.contains(&file_name)
-                {
-                    continue;
-                }
-                if self
-                    .config
-                    .blacklisted_file_extensions
-                    .contains(&file_extension)
-                    && !self.include.contains(&file_extension)
-                {
-                    continue;
-                }
+                let content = mia_file.get_content()?;
 
-                self.zip
-                    .start_file(&stripped_path, FileOptions::default())?;
+                self.zip.start_file(&stripped_path, FileOptions::default())?;
                 self.zip.write_all(&content)?;
 
-                if self.verbose {
-                    let mut lines = 0;
-                    if LANGUAGES.contains(&&*file_extension) {
-                        let text_content = std::str::from_utf8(&content);
-                        if let Ok(text) = text_content {
-                            lines = text.lines().count();
-                        }
+                let lines = mia_file.count_lines();
+                let entry = &mut self.lines.entry(lines.0);
+
+                match entry {
+                    std::collections::hash_map::Entry::Occupied(ref mut occupied) => {
+                        // Increment the value if the key exists
+                        *occupied.get_mut() += lines.1;
                     }
-                    let lines_text = if lines > 0 { format!("({lines} lines)") } else { ""
-                        .to_string() };
+                    std::collections::hash_map::Entry::Vacant(_vacant) => {
+                        // Add the key with value 1 if the key doesn't exist
+                        self.lines.insert(lines.0, lines.1);
+                    }
+                }
+
+                if self.verbose {
+                    let lines_text = if lines.1 > 0 { format!("({} lines)", lines.1) } else { String::new() };
                     println!(
                         "[FILE] {color_green}+{color_reset} {color_cyan}{:?}{color_reset} \
                         {color_yellow}{lines_text}{color_reset}",
                         &stripped_path
                     );
                 }
+
                 self.count += 1;
             }
         }
         Ok(())
+    }
+}
+
+struct MiaFile {
+    name: String,
+    extension: String,
+    location: PathBuf
+}
+
+impl MiaFile {
+    fn new(name: String, extension: String, location: &PathBuf) -> Self {
+        let name = name.replace(&".".to_string().add(&extension), "");
+        MiaFile {
+            name,
+            extension,
+            location: location.to_owned()
+        }
+    }
+
+    fn get_content(&self) -> Result<Vec<u8>, Error> {
+        fs::read(&self.location).map_err(|_| Error::CantReadFile)
+    }
+
+    fn count_lines(&self) -> (Language, i128) {
+        let language = detect_language(&self.extension);
+        let content = self.get_content().unwrap();
+        let text_content = std::str::from_utf8(&content);
+        if let Ok(text) = text_content {
+            (language, text.lines().filter(|line| !line.trim().is_empty()).count() as i128)
+        } else { (language, 0) }
     }
 }
 

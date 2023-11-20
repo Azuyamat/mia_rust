@@ -6,6 +6,7 @@ mod config;
 mod dir_manager;
 mod error;
 mod release;
+mod languages;
 
 use std::fs::{File, OpenOptions};
 use std::string::ToString;

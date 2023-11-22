@@ -10,6 +10,7 @@ mod languages;
 
 use std::fs;
 use std::fs::{File, OpenOptions};
+use std::path::PathBuf;
 use std::string::ToString;
 use std::time::Instant;
 use crate::cli::ConfigAction;
@@ -105,15 +106,28 @@ fn main() -> Result<(), Error> {
             println!("Updating Mia to {color_bright_green}{ver}{color_reset}");
 
             let start = Instant::now();
-            let mut file = find_or_create_file("mia-tmp.exe")?;
+            let mut path = std::env::current_exe()?;
+            path.pop();
+            path.push("mia-tmp.exe");
+
+            println!("{path:?}");
+            let mut file = find_or_create_file(&path)?;
             println!("Downloading asset...");
             let download_link = get_download_link_for_asset(&ver)?;
             download_asset(&download_link, &mut file)?;
             println!("Downloaded asset.");
             println!("Renaming mia.exe to mia-old.exe");
-            fs::rename("mia.exe", "mia-old.exe")?;
+            let mut new_path = path.clone();
+            new_path.pop();
+            new_path.push("mia.exe");
+
+            let mut old_path = path.clone();
+            old_path.pop();
+            old_path.push("mia-old.exe");
+
+            fs::rename(&new_path, &old_path)?;
             println!("Renaming mia-tmp.exe to mia.exe");
-            fs::rename("mia-tmp.exe", "mia.exe")?;
+            fs::rename(&path, &new_path)?;
             let elapsed = start.elapsed().as_millis();
 
             ver = match &version {
@@ -139,7 +153,7 @@ pub fn print_pretty_header(text: &str, padding: usize) {
     println!("{}", "=".repeat(text.len() + (padding * 2)));
 }
 
-fn find_or_create_file(file_path: &str) -> std::io::Result<File> {
+fn find_or_create_file(file_path: &PathBuf) -> std::io::Result<File> {
     OpenOptions::new()
         .read(true)
         .write(true)

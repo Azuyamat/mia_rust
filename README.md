@@ -64,16 +64,61 @@ Get the current version of the program.
 ## Examples
 
 ```shell
-mia create C:\code\fizzbuzz fizzbuzz -v
+mia create D:\code\fizzbuzz fizzbuzz -v
+#Output: Zipped 18 files in 1850ms (222 lines)
 ```
 ```shell
-mia create C:\code\fizzbuzz fizzbuzz -v -o C:\code
+mia create D:\code\fizzbuzz fizzbuzz -v -o D:\code
+#Output:
+#--------------------------------------
+#Zipping: "mia_zip_2023-11-22_2346922.zip"
+#Output: "D:\\code\\mia_zip_2023-11-22_2346922.zip"
+#Excluding: [["zip", "pdf"], [], [".git", "bin", "obj", ".idea", ".vs", "target", "node_modules", ".idea", ".next"], []] (Use --exclude or -e)
+#Including: [] (Use --include or -i)
+#--------------------------------------
+#[FILE] + ".eslintrc.json" (3 lines)
+#[DIR] / "D:\\code\\nextjs\\revolv\\.git"
+#[FILE] + ".gitignore" (28 lines)
+#[DIR] / "D:\\code\\nextjs\\revolv\\.idea"
+#[DIR] / "D:\\code\\nextjs\\revolv\\.next"
+#[FILE] + "next-env.d.ts" (4 lines)
+#[FILE] + "next.config.js" (5 lines)
+#[DIR] / "D:\\code\\nextjs\\revolv\\node_modules"
+#[FILE] + "package-lock.json" (4341 lines)
+#[FILE] + "package.json" (27 lines)
+#[FILE] + "postcss.config.js" (6 lines)
+#[FILE] + "public\\favicon.ico"
+#[FILE] + "public\\next.svg" (1 lines)
+#[FILE] + "public\\vercel.svg" (1 lines)
+#[DIR] + "D:\\code\\nextjs\\revolv\\public"
+#[FILE] + "README.md" (25 lines)
+#[FILE] + "src\\pages\\api\\hello.ts" (11 lines)
+#[DIR] + "D:\\code\\nextjs\\revolv\\src\\pages\\api"
+#[FILE] + "src\\pages\\index.tsx" (111 lines)
+#[FILE] + "src\\pages\\_app.tsx" (5 lines)
+#[FILE] + "src\\pages\\_document.tsx" (12 lines)
+#[DIR] + "D:\\code\\nextjs\\revolv\\src\\pages"
+#[FILE] + "src\\styles\\globals.css" (24 lines)
+#[DIR] + "D:\\code\\nextjs\\revolv\\src\\styles"
+#[DIR] + "D:\\code\\nextjs\\revolv\\src"
+#[FILE] + "tailwind.config.ts" (19 lines)
+#[FILE] + "tsconfig.json" (22 lines)
+#Zipped 18 files in 20ms (222 lines)
+#--------------------------------------
+#TypeScript: 162 lines (72.97%)
+#Other: 4423 lines
+#CSS: 24 lines (10.81%)
+#JavaScript: 11 lines (4.95%)
+#Markdown: 25 lines (11.26%)
+#--------------------------------------
 ```
 ```shell
 mia create C:\code\fizzbuzz fizzbuzz -v -o C:\code -e exe -e fizzbuzz -e fizzbuzz2
+#Output: Similar to above
 ```
 ```shell
 mia config set naming :name
+#Output: Successfully changed key `naming` to `:name`
 ```
 
 ## License
